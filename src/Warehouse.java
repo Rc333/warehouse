@@ -1,9 +1,8 @@
-package src;
-
 import java.util.*;
 import java.io.*;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import java.math.BigDecimal;
 
 public class Warehouse implements Serializable {
 
@@ -21,6 +20,8 @@ public class Warehouse implements Serializable {
     private ClientList clientList;
     private static Warehouse warehouse;
     private List transactions = new LinkedList(); //product transaction
+    private List invoice = new LinkedList();
+    protected Double sumProduct = 0.0;
 
     private Warehouse() {
         ProductList = ProductList.instance();
@@ -36,8 +37,8 @@ public class Warehouse implements Serializable {
         }
     }
 
-    public Product addProduct(String title, String author, String id) {
-        Product product = new Product(title, author, id);
+    public Product addProduct(String name, String manufacturer, String id, Double price, Integer quantity) {
+        Product product = new Product(name, manufacturer, id, price,quantity );
         if (ProductList.insertProduct(product)) {
             return (product);
         }
@@ -149,17 +150,61 @@ public class Warehouse implements Serializable {
 
     public Boolean insertTransaction(Client client, Product product, Date date) {
         try {
-            transactions.add(client.getName() + " " + product.getTitle() + " due on " + date);
+            transactions.add(product.getProductName() + " sold on " + date + " to Client: "+client.getName() +" at price "+ product.getPrice());
             return TRUE;
         } catch (Exception e) {
             return FALSE;
         }
     }
     
-    
+        public void decQuantity(Product product){
+        product.quantity-=1;
+    }
+
     public List getTransactions() {
     return transactions;
   }
 
+    public boolean insertInvoice(Product product, Client client,Date date){
+        invoice.add(product.getProductName() + " sold on " + date + " to Client: "+client.getName() +" at price "+ product.getPrice());
+  return TRUE;  
+    }
+    
+    public List getInvoice() {
+    return invoice;
+    }
+    
+    public Double getSumProduct(){
+    return sumProduct;
+    }
+    
+    public void flushInvoice(){
+    invoice.clear();
+    }
+    
+    
+    public Product issueBook(String memberID, String bookID) {
+
+	Product product = ProductList.search(bookID);
+	if(product == null) {	
+	return(null);
+	}
+
+	if(product.getBorrower() != null){
+            System.out.println("Book issued to "+book.getBorrower().getName()+". Book can't be issued !!!");
+		return null;
+	}
+	Member member = memberList.search(memberID);
+	if(member == null) {
+		return null;
+	}
+	if(!(book.issue(member) && member.issue(book) )){
+		return null;
+	}
+
+	return book;
+	
+}
+    
 }
 

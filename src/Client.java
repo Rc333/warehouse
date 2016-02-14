@@ -1,6 +1,3 @@
-//comments from bikrant
-package src;
-
 import java.util.*;
 import java.io.*;
 public class Client implements Serializable {

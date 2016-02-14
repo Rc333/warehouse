@@ -1,9 +1,9 @@
-package src;
 import java.util.*;
 import java.text.*;
 import java.io.*;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import java.math.BigDecimal;
 
 public class UserInterface {
 
@@ -140,11 +140,14 @@ public class UserInterface {
     public void addProducts() {
         Product result;
         do {
-            String title = getToken("Enter  title");
-            String productID = getToken("Enter id");
-            String author = getToken("Enter author");
-            result = warehouse.addProduct(title, author, productID);
-            if (result != null) {
+            //String name, String manufacturer, String id, BigDecimal price
+            String name = getToken("Enter Product Name");
+            String productID = getToken("Enter Product ID");
+            String manufacturer = getToken("Enter Manufacturer");
+            Double price = Double.parseDouble(getToken("Enter Price")) ;
+            Integer quantity= Integer.parseInt(getToken("Enter the Quantity"));
+            result = warehouse.addProduct(name, manufacturer, productID, price, quantity);
+            if (result != null && quantity>0) {
                 System.out.println(result);
             } else {
                 System.out.println("Product could not be added");
@@ -157,28 +160,34 @@ public class UserInterface {
 
     public void issueProducts() {
 
+        // ask user ID, call warehouse.testclient to see if it exists, if true, proceeed
+        // to issueProduct at Warehouse class
+        
         String clientID = getToken("Enter User ID");
         Client client = warehouse.testClient(clientID);
-        if (client != null) {
-//            System.out.println("Use exist");
-
+        if (client != null ) {
+            //call, method at warehouse for further transaction, move all operations to warehouse methof
+            
+            
+            
+            warehouse.sumProduct = 0.0;
             // check out multiple product for the user
             do {
                 String productID = getToken("Enter Product ID");
                 Product product = warehouse.testProduct(productID);
                 if (product != null) {
-                    if(product.borrower==null){   
+                    if(product.quantity>0){   
                     Calendar date = Calendar.getInstance();
                     //setting the due date
                     date.setTime(new Date());
-                    date.add(Calendar.DATE, 30);
-                    System.out.println("PRODUCT " + product.getTitle() + " has been issued to " + client.getName());
-                    product.Borrower(client, date.getTime());
-                    System.out.println("The due date to return this product is " + date.getTime());
+                    System.out.println("PRODUCT " + product.getProductName() + " has been sold to " + client.getName()+ " at price: "+product.getPrice());
+                    warehouse.decQuantity(product);
+                    warehouse.sumProduct+=product.getPrice();
+                    System.out.println("Cumulative Total " + warehouse.sumProduct);
                     warehouse.insertTransaction(client, product, date.getTime());
                 }
                     else{
-                    System.out.println(" Issue denied, product already issued to "+ product.borrower.getName()+". Product will return on " +product.dueDate);
+                    System.out.println(" product low in stock");
                     }
                 
                 
