@@ -1,3 +1,4 @@
+
 import java.util.*;
 import java.text.*;
 import java.io.*;
@@ -144,10 +145,10 @@ public class UserInterface {
             String name = getToken("Enter Product Name");
             String productID = getToken("Enter Product ID");
             String manufacturer = getToken("Enter Manufacturer");
-            Double price = Double.parseDouble(getToken("Enter Price")) ;
-            Integer quantity= Integer.parseInt(getToken("Enter the Quantity"));
+            Double price = Double.parseDouble(getToken("Enter Price"));
+            Integer quantity = Integer.parseInt(getToken("Enter the Quantity"));
             result = warehouse.addProduct(name, manufacturer, productID, price, quantity);
-            if (result != null && quantity>0) {
+            if (result != null && quantity > 0) {
                 System.out.println(result);
             } else {
                 System.out.println("Product could not be added");
@@ -162,35 +163,23 @@ public class UserInterface {
 
         // ask user ID, call warehouse.testclient to see if it exists, if true, proceeed
         // to issueProduct at Warehouse class
-        
         String clientID = getToken("Enter User ID");
         Client client = warehouse.testClient(clientID);
-        if (client != null ) {
-            //call, method at warehouse for further transaction, move all operations to warehouse methof
-            
-            
-            
-            warehouse.sumProduct = 0.0;
-            // check out multiple product for the user
+        if (client == null) {
+            System.out.println("No such member");
+            return;
+        } else {
+
             do {
+
+                // do while loop here to ask for books. 
                 String productID = getToken("Enter Product ID");
-                Product product = warehouse.testProduct(productID);
-                if (product != null) {
-                    if(product.quantity>0){   
-                    Calendar date = Calendar.getInstance();
-                    //setting the due date
-                    date.setTime(new Date());
-                    System.out.println("PRODUCT " + product.getProductName() + " has been sold to " + client.getName()+ " at price: "+product.getPrice());
-                    warehouse.decQuantity(product);
-                    warehouse.sumProduct+=product.getPrice();
-                    System.out.println("Cumulative Total " + warehouse.sumProduct);
-                    warehouse.insertTransaction(client, product, date.getTime());
-                }
-                    else{
-                    System.out.println(" product low in stock");
+                if (warehouse.testProduct(productID) != null) {
+                    Integer quantity = Integer.parseInt(getToken("Enter the Quantity"));
+                    if (warehouse.issueProduct(client, productID, quantity)) {
+
                     }
-                
-                
+
                 } else {
                     System.out.println("Product does not exist");
                 }
@@ -200,9 +189,40 @@ public class UserInterface {
                 }
             } while (true);
 
-        } else {
-            System.out.println("client does not exist");
         }
+
+        //call, method at warehouse for further transaction, move all operations to warehouse methof
+//            warehouse.sumProduct = 0.0;
+//            // check out multiple product for the user
+//            do {
+//                String productID = getToken("Enter Product ID");
+//                Product product = warehouse.testProduct(productID);
+//                if (product != null) {
+//                    if(product.quantity>0){   
+//                    Calendar date = Calendar.getInstance();
+//                    //setting the due date
+//                    date.setTime(new Date());
+//                    System.out.println("PRODUCT " + product.getProductName() + " has been sold to " + client.getName()+ " at price: "+product.getPrice());
+//                    warehouse.decQuantity(product);
+//                    warehouse.sumProduct+=product.getPrice();
+//                    System.out.println("Cumulative Total " + warehouse.sumProduct);
+//                    warehouse.insertTransaction(client, product, date.getTime());
+//                }
+//                    else{
+//                    System.out.println(" product low in stock");
+//                    }
+//                
+//                
+//                } else {
+//                    System.out.println("Product does not exist");
+//                }
+//
+//                if (!yesOrNo("Add more products?")) {
+//                    break;
+//                }
+//            } while (true);
+//
+//        
     }
 
     public void renewProducts() {

@@ -1,3 +1,4 @@
+
 import java.util.*;
 import java.io.*;
 import static java.lang.Boolean.FALSE;
@@ -38,7 +39,7 @@ public class Warehouse implements Serializable {
     }
 
     public Product addProduct(String name, String manufacturer, String id, Double price, Integer quantity) {
-        Product product = new Product(name, manufacturer, id, price,quantity );
+        Product product = new Product(name, manufacturer, id, price, quantity);
         if (ProductList.insertProduct(product)) {
             return (product);
         }
@@ -150,61 +151,65 @@ public class Warehouse implements Serializable {
 
     public Boolean insertTransaction(Client client, Product product, Date date) {
         try {
-            transactions.add(product.getProductName() + " sold on " + date + " to Client: "+client.getName() +" at price "+ product.getPrice());
+            transactions.add(product.getProductName() + " sold on " + date + " to Client: " + client.getName() + " at price " + product.getPrice());
             return TRUE;
         } catch (Exception e) {
             return FALSE;
         }
     }
-    
-        public void decQuantity(Product product){
-        product.quantity-=1;
+
+    public void decQuantity(Product product) {
+        product.quantity -= 1;
     }
 
     public List getTransactions() {
-    return transactions;
-  }
-
-    public boolean insertInvoice(Product product, Client client,Date date){
-        invoice.add(product.getProductName() + " sold on " + date + " to Client: "+client.getName() +" at price "+ product.getPrice());
-  return TRUE;  
+        return transactions;
     }
-    
+
+    public boolean insertInvoice(Product product, Client client, Date date) {
+        invoice.add(product.getProductName() + " sold on " + date + " to Client: " + client.getName() + " at price " + product.getPrice());
+        return TRUE;
+    }
+
     public List getInvoice() {
-    return invoice;
+        return invoice;
     }
-    
-    public Double getSumProduct(){
-    return sumProduct;
+
+    public Double getSumProduct() {
+        return sumProduct;
     }
-    
-    public void flushInvoice(){
-    invoice.clear();
+
+    public void flushInvoice() {
+        invoice.clear();
     }
-    
-    
-    public Product issueBook(String memberID, String bookID) {
 
-	Product product = ProductList.search(bookID);
-	if(product == null) {	
-	return(null);
-	}
+    public Boolean issueProduct(Client client, String productID, Integer quantity) {
 
-	if(product.getBorrower() != null){
-            System.out.println("Book issued to "+book.getBorrower().getName()+". Book can't be issued !!!");
-		return null;
-	}
-	Member member = memberList.search(memberID);
-	if(member == null) {
-		return null;
-	}
-	if(!(book.issue(member) && member.issue(book) )){
-		return null;
-	}
+        boolean status = FALSE;    
+        try {
 
-	return book;
-	
+            Product product = ProductList.checkProduct(productID);
+            if (product != null) {
+                //System.out.println("Product does not exist");
+                if (quantity < product.quantity) {
+                    // send to wait list
+                    System.out.println("Less quantity, qunatity sent to wait list");
+                } else {
+
+                // issue product and write to the invoice
+                }
+
+            status = TRUE;
+            }
+            else {
+            status = FALSE;
+            }
+
+        } catch (Exception e) {
+            status = FALSE;
+        }
+
+        return status;
+    }
+
 }
-    
-}
-
